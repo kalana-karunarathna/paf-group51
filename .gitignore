@@ -1,0 +1,27 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build outputs
+backend/target/
+frontend/dist/
+**/.tools/
+backend/.m2/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Application properties (contains secrets)
+backend/src/main/resources/application.properties
+
+# IDE and OS files
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
