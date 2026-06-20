@@ -28,7 +28,7 @@ public class ResourceController {
     
     // Get resource by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Resource> getResourceById(@PathVariable String id) {
+    public ResponseEntity<Resource> getResourceById(@PathVariable Long id) {
         Optional<Resource> resource = resourceService.getResourceById(id);
         return resource.map(ResponseEntity::ok)
                       .orElse(ResponseEntity.notFound().build());
@@ -47,7 +47,7 @@ public class ResourceController {
     
     // Update resource
     @PutMapping("/{id}")
-    public ResponseEntity<Resource> updateResource(@PathVariable String id, @Valid @RequestBody Resource resource) {
+    public ResponseEntity<Resource> updateResource(@PathVariable Long id, @Valid @RequestBody Resource resource) {
         try {
             Optional<Resource> updatedResource = resourceService.updateResource(id, resource);
             return updatedResource.map(ResponseEntity::ok)
@@ -59,7 +59,7 @@ public class ResourceController {
     
     // Delete resource
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteResource(@PathVariable String id) {
+    public ResponseEntity<Void> deleteResource(@PathVariable Long id) {
         boolean deleted = resourceService.deleteResource(id);
         if (deleted) {
             return ResponseEntity.noContent().build();

@@ -1,15 +1,21 @@
 package com.fms.resources.model;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import jakarta.validation.constraints.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+
 import java.time.LocalDateTime;
 
-@Document(collection = "resources")
+@Entity
+@Table(name = "resources")
 public class Resource {
     
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     
     @NotBlank(message = "Resource name is required")
     @Size(min = 2, max = 100, message = "Resource name must be between 2 and 100 characters")
@@ -49,11 +55,11 @@ public class Resource {
     }
     
     // Getters and Setters
-    public String getId() {
+    public Long getId() {
         return id;
     }
     
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
     
@@ -135,7 +141,7 @@ public class Resource {
     @Override
     public String toString() {
         return "Resource{" +
-                "id='" + id + '\'' +
+                "id=" + id +
                 ", name='" + name + '\'' +
                 ", type='" + type + '\'' +
                 ", capacity=" + capacity +

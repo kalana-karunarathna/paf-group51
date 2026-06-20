@@ -12,9 +12,10 @@ backend/.m2/
 .env
 .env.local
 .env.*.local
+uploads/
+test-mongo.js
+test-mongo-connection.ps1
 
-# Application properties (contains secrets)
-backend/src/main/resources/application.properties
 
 # IDE and OS files
 .idea/

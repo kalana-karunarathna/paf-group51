@@ -59,7 +59,7 @@ public class NotificationController {
     }
 
     @PutMapping("/{id}/read")
-    public ResponseEntity<ApiResponse<Notification>> markAsRead(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<Notification>> markAsRead(@PathVariable Long id) {
         ApiResponse<Notification> response = notificationService.markNotificationAsRead(id);
         if (response.isSuccess()) {
             return ResponseEntity.ok(response);
@@ -69,7 +69,7 @@ public class NotificationController {
     }
 
     @PutMapping("/{id}/unread")
-    public ResponseEntity<ApiResponse<Notification>> markAsUnread(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<Notification>> markAsUnread(@PathVariable Long id) {
         ApiResponse<Notification> response = notificationService.markNotificationAsUnread(id);
         if (response.isSuccess()) {
             return ResponseEntity.ok(response);
@@ -85,7 +85,7 @@ public class NotificationController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteNotification(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<Void>> deleteNotification(@PathVariable Long id) {
         ApiResponse<Void> response = notificationService.deleteNotification(id);
         if (response.isSuccess()) {
             return ResponseEntity.ok(response);

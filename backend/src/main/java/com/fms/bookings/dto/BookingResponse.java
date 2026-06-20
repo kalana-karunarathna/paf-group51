@@ -11,7 +11,7 @@ import lombok.Data;
 @Builder
 public class BookingResponse {
 
-	private String id;
+	private Long id;
 	private String resourceId;
 	private String resourceName;
 	private Integer capacity;

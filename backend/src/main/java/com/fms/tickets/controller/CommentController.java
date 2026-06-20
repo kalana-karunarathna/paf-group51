@@ -21,7 +21,7 @@ public class CommentController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<Comment>> createComment(
-            @PathVariable String ticketId,
+            @PathVariable Long ticketId,
             @RequestBody Map<String, String> commentRequest,
             @RequestHeader(value = "X-User-Email", required = false) String userEmail,
             @RequestHeader(value = "X-User-Name", required = false) String userName,
@@ -41,7 +41,7 @@ public class CommentController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Comment>>> getCommentsByTicketId(@PathVariable String ticketId) {
+    public ResponseEntity<ApiResponse<List<Comment>>> getCommentsByTicketId(@PathVariable Long ticketId) {
         ApiResponse<List<Comment>> response = commentService.getCommentsByTicketId(ticketId);
         if (response.isSuccess()) {
             return ResponseEntity.ok(response);
@@ -52,8 +52,8 @@ public class CommentController {
 
     @PutMapping("/{commentId}")
     public ResponseEntity<ApiResponse<Comment>> updateComment(
-            @PathVariable String ticketId,
-            @PathVariable String commentId,
+            @PathVariable Long ticketId,
+            @PathVariable Long commentId,
             @RequestBody Map<String, String> commentRequest,
             @RequestHeader(value = "X-User-Email", required = false) String userEmail,
             @RequestHeader(value = "X-User-Role", required = false) String userRole) {
@@ -72,8 +72,8 @@ public class CommentController {
 
     @DeleteMapping("/{commentId}")
     public ResponseEntity<ApiResponse<Void>> deleteComment(
-            @PathVariable String ticketId,
-            @PathVariable String commentId,
+            @PathVariable Long ticketId,
+            @PathVariable Long commentId,
             @RequestHeader(value = "X-User-Email", required = false) String userEmail,
             @RequestHeader(value = "X-User-Role", required = false) String userRole) {
         
@@ -90,8 +90,8 @@ public class CommentController {
 
     @GetMapping("/{commentId}")
     public ResponseEntity<ApiResponse<Comment>> getCommentById(
-            @PathVariable String ticketId,
-            @PathVariable String commentId) {
+            @PathVariable Long ticketId,
+            @PathVariable Long commentId) {
         ApiResponse<Comment> response = commentService.getCommentById(commentId);
         if (response.isSuccess()) {
             return ResponseEntity.ok(response);

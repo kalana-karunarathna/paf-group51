@@ -23,7 +23,7 @@ public class ResourceService {
     }
     
     // Get resource by ID
-    public Optional<Resource> getResourceById(String id) {
+    public Optional<Resource> getResourceById(Long id) {
         return resourceRepository.findById(id);
     }
     
@@ -58,7 +58,7 @@ public class ResourceService {
     }
     
     // Update resource
-    public Optional<Resource> updateResource(String id, Resource resourceDetails) {
+    public Optional<Resource> updateResource(Long id, Resource resourceDetails) {
         return resourceRepository.findById(id).map(resource -> {
             // Validate resource type
             if (!isValidType(resourceDetails.getType())) {
@@ -98,7 +98,7 @@ public class ResourceService {
     }
     
     // Delete resource
-    public boolean deleteResource(String id) {
+    public boolean deleteResource(Long id) {
         if (resourceRepository.existsById(id)) {
             resourceRepository.deleteById(id);
             return true;

@@ -57,7 +57,7 @@ public class NotificationService {
         }
     }
 
-    public ApiResponse<Notification> markNotificationAsRead(String notificationId) {
+    public ApiResponse<Notification> markNotificationAsRead(Long notificationId) {
         try {
             Optional<Notification> notification = notificationRepository.findById(notificationId);
             if (notification.isPresent()) {
@@ -73,7 +73,7 @@ public class NotificationService {
         }
     }
 
-    public ApiResponse<Notification> markNotificationAsUnread(String notificationId) {
+    public ApiResponse<Notification> markNotificationAsUnread(Long notificationId) {
         try {
             Optional<Notification> notification = notificationRepository.findById(notificationId);
             if (notification.isPresent()) {
@@ -118,7 +118,7 @@ public class NotificationService {
         }
     }
 
-    public ApiResponse<Void> deleteNotification(String notificationId) {
+    public ApiResponse<Void> deleteNotification(Long notificationId) {
         try {
             if (notificationRepository.existsById(notificationId)) {
                 notificationRepository.deleteById(notificationId);

@@ -19,7 +19,7 @@ public class BookingNotificationListener {
 	@EventListener
 	public void handleBookingDecision(BookingDecisionEvent event) {
 		if (event.status() == BookingStatus.APPROVED || event.status() == BookingStatus.REJECTED) {
-			notificationService.notifyBookingDecision(event.bookingId(), event.requestedBy(), event.status(), event.reason());
+			notificationService.notifyBookingDecision(String.valueOf(event.bookingId()), event.requestedBy(), event.status(), event.reason());
 		}
 	}
 }

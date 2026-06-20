@@ -3,7 +3,6 @@ package com.fms.bookings.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
-import java.util.regex.Pattern;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -58,7 +57,7 @@ public class BookingService {
 		return toResponse(bookingRepository.save(booking));
 	}
 
-	public BookingResponse updateBooking(String bookingId, BookingUpdateRequest request) {
+	public BookingResponse updateBooking(Long bookingId, BookingUpdateRequest request) {
 		validateDateRange(request.getStartDateTime(), request.getEndDateTime());
 
 		Booking booking = getBookingEntityOrThrow(bookingId);
@@ -79,7 +78,7 @@ public class BookingService {
 		return toResponse(bookingRepository.save(booking));
 	}
 
-	public BookingResponse cancelBooking(String bookingId) {
+	public BookingResponse cancelBooking(Long bookingId) {
 		Booking booking = getBookingEntityOrThrow(bookingId);
 
 		if (booking.getStatus() == BookingStatus.CANCELLED) {
@@ -94,7 +93,7 @@ public class BookingService {
 		return toResponse(bookingRepository.save(booking));
 	}
 
-	public BookingResponse approveBooking(String bookingId, String approvedBy) {
+	public BookingResponse approveBooking(Long bookingId, String approvedBy) {
 		Booking booking = getBookingEntityOrThrow(bookingId);
 
 		if (booking.getStatus() != BookingStatus.PENDING) {
@@ -113,7 +112,7 @@ public class BookingService {
 		return toResponse(saved);
 	}
 
-	public BookingResponse rejectBooking(String bookingId, String reason) {
+	public BookingResponse rejectBooking(Long bookingId, String reason) {
 		Booking booking = getBookingEntityOrThrow(bookingId);
 
 		if (booking.getStatus() != BookingStatus.PENDING) {
@@ -130,11 +129,11 @@ public class BookingService {
 		return toResponse(saved);
 	}
 
-	public BookingResponse getBookingById(String bookingId) {
+	public BookingResponse getBookingById(Long bookingId) {
 		return toResponse(getBookingEntityOrThrow(bookingId));
 	}
 
-	public void deleteBooking(String bookingId) {
+	public void deleteBooking(Long bookingId) {
 		Booking booking = getBookingEntityOrThrow(bookingId);
 		bookingRepository.delete(booking);
 	}
@@ -145,8 +144,7 @@ public class BookingService {
 
 	public List<BookingResponse> getBookingsByRequester(String requestedBy) {
 		String normalizedEmail = normalizeEmail(requestedBy);
-		String exactEmailPattern = "^" + Pattern.quote(normalizedEmail) + "$";
-		return bookingRepository.findByRequestedByCaseInsensitive(exactEmailPattern)
+		return bookingRepository.findByRequestedByIgnoreCaseOrderByCreatedAtDesc(normalizedEmail)
 			.stream()
 			.map(this::toResponse)
 			.toList();
@@ -156,12 +154,12 @@ public class BookingService {
 		return bookingRepository.findByStatusOrderByCreatedAtDesc(status).stream().map(this::toResponse).toList();
 	}
 
-	private Booking getBookingEntityOrThrow(String bookingId) {
+	private Booking getBookingEntityOrThrow(Long bookingId) {
 		return bookingRepository.findById(bookingId)
 			.orElseThrow(() -> new BookingNotFoundException("Booking not found with id: " + bookingId));
 	}
 
-	private void checkConflict(String resourceId, LocalDateTime startDateTime, LocalDateTime endDateTime, String excludeId) {
+	private void checkConflict(String resourceId, LocalDateTime startDateTime, LocalDateTime endDateTime, Long excludeId) {
 		List<Booking> conflicts = (excludeId == null)
 			? bookingRepository.findConflictingBookings(resourceId, CONFLICT_STATUSES, startDateTime, endDateTime)
 			: bookingRepository.findConflictingBookingsExcludingId(resourceId, CONFLICT_STATUSES, startDateTime, endDateTime,
