@@ -28,6 +28,10 @@ phases:
       - FRONTEND_IMAGE_URI=$ECR_REGISTRY/$FRONTEND_REPO_NAME:$IMAGE_TAG
       - echo "Backend image URI $BACKEND_IMAGE_URI"
       - echo "Frontend image URI $FRONTEND_IMAGE_URI"
+
+      - echo "Logging in to Docker Hub"
+      - echo "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+
       - echo "Logging in to Amazon ECR"
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
 
