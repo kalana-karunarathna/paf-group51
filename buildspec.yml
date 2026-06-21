@@ -53,10 +53,11 @@ phases:
       - docker tag $FRONTEND_REPO_NAME:$IMAGE_TAG $FRONTEND_IMAGE_URI
 
       - echo "Running Trivy scan for backend image"
-      - trivy image --severity HIGH,CRITICAL --exit-code 0 $BACKEND_IMAGE_URI
+      - trivy image --severity HIGH,CRITICAL --exit-code 0 $BACKEND_REPO_NAME:$IMAGE_TAG
+
 
       - echo "Running Trivy scan for frontend image"
-      - trivy image --severity HIGH,CRITICAL --exit-code 0 $FRONTEND_IMAGE_URI
+      - trivy image --severity HIGH,CRITICAL --exit-code 0 $FRONTEND_REPO_NAME:$IMAGE_TAG
 
   post_build:
     commands:
