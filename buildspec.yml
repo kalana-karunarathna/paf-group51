@@ -16,6 +16,7 @@ phases:
       - echo "Install phase started"
       - echo "Installing Trivy"
       - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+      - trivy --version
 
   pre_build:
     commands:
@@ -25,6 +26,8 @@ phases:
       - ECR_REGISTRY=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
       - BACKEND_IMAGE_URI=$ECR_REGISTRY/$BACKEND_REPO_NAME:$IMAGE_TAG
       - FRONTEND_IMAGE_URI=$ECR_REGISTRY/$FRONTEND_REPO_NAME:$IMAGE_TAG
+      - echo "Backend image URI $BACKEND_IMAGE_URI"
+      - echo "Frontend image URI $FRONTEND_IMAGE_URI"
       - echo "Logging in to Amazon ECR"
       - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
 
@@ -34,8 +37,8 @@ phases:
 
       - echo "Running backend Maven tests"
       - cd backend
-      - chmod +x mvnw || true
-      - ./mvnw clean test
+      - mvn -version
+      - mvn -B clean test
       - cd ..
 
       - echo "Running frontend build"
@@ -55,13 +58,17 @@ phases:
       - echo "Running Trivy scan for backend image"
       - trivy image --severity HIGH,CRITICAL --exit-code 0 $BACKEND_REPO_NAME:$IMAGE_TAG
 
-
       - echo "Running Trivy scan for frontend image"
       - trivy image --severity HIGH,CRITICAL --exit-code 0 $FRONTEND_REPO_NAME:$IMAGE_TAG
 
   post_build:
     commands:
       - echo "Post-build phase started"
+      - |
+        if [ "$CODEBUILD_BUILD_SUCCEEDING" -ne 1 ]; then
+          echo "Previous phase failed, skipping ECR push"
+          exit 1
+        fi
       - echo "Pushing backend image to ECR"
       - docker push $BACKEND_IMAGE_URI
       - echo "Pushing frontend image to ECR"
