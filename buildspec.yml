@@ -1,0 +1,86 @@
+version: 0.2
+
+env:
+  variables:
+    AWS_REGION: "us-east-1"
+    BACKEND_REPO_NAME: "campus-backend"
+    FRONTEND_REPO_NAME: "campus-frontend"
+    IMAGE_TAG: "dev"
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto17
+      nodejs: 20
+    commands:
+      - echo "Install phase started"
+      - echo "Installing Trivy"
+      - curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+      - trivy --version
+
+  pre_build:
+    commands:
+      - echo "Pre-build phase started"
+      - aws sts get-caller-identity
+      - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - ECR_REGISTRY=$ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+      - BACKEND_IMAGE_URI=$ECR_REGISTRY/$BACKEND_REPO_NAME:$IMAGE_TAG
+      - FRONTEND_IMAGE_URI=$ECR_REGISTRY/$FRONTEND_REPO_NAME:$IMAGE_TAG
+      - echo "Backend image URI $BACKEND_IMAGE_URI"
+      - echo "Frontend image URI $FRONTEND_IMAGE_URI"
+      - echo "Logging in to Amazon ECR"
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+
+  build:
+    commands:
+      - echo "Build phase started"
+
+      - echo "Running backend Maven tests and packaging jar"
+      - cd backend
+      - mvn -version
+      - mvn -B clean package
+      - echo "Listing backend target folder"
+      - ls -lah target
+      - cd ..
+
+      - echo "Running frontend build"
+      - cd frontend
+      - npm ci
+      - npm run build
+      - echo "Listing frontend dist folder"
+      - ls -lah dist
+      - cd ..
+
+      - echo "Building backend Docker image"
+      - docker build -t $BACKEND_REPO_NAME:$IMAGE_TAG ./backend
+      - docker tag $BACKEND_REPO_NAME:$IMAGE_TAG $BACKEND_IMAGE_URI
+
+      - echo "Building frontend Docker image"
+      - docker build -t $FRONTEND_REPO_NAME:$IMAGE_TAG ./frontend
+      - docker tag $FRONTEND_REPO_NAME:$IMAGE_TAG $FRONTEND_IMAGE_URI
+
+      - echo "Running Trivy scan for backend image"
+      - trivy image --severity HIGH,CRITICAL --exit-code 0 $BACKEND_REPO_NAME:$IMAGE_TAG
+
+      - echo "Running Trivy scan for frontend image"
+      - trivy image --severity HIGH,CRITICAL --exit-code 0 $FRONTEND_REPO_NAME:$IMAGE_TAG
+
+  post_build:
+    commands:
+      - echo "Post-build phase started"
+      - |
+        if [ "$CODEBUILD_BUILD_SUCCEEDING" -ne 1 ]; then
+          echo "Previous phase failed, skipping ECR push"
+          exit 1
+        fi
+      - echo "Pushing backend image to ECR"
+      - docker push $BACKEND_IMAGE_URI
+      - echo "Pushing frontend image to ECR"
+      - docker push $FRONTEND_IMAGE_URI
+      - echo "Build completed successfully"
+      - echo "Backend image $BACKEND_IMAGE_URI"
+      - echo "Frontend image $FRONTEND_IMAGE_URI"
+
+artifacts:
+  files:
+    - buildspec.yml
