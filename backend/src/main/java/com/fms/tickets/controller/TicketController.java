@@ -79,7 +79,7 @@ public class TicketController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Ticket>> getTicketById(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<Ticket>> getTicketById(@PathVariable Long id) {
         ApiResponse<Ticket> response = ticketService.getTicketById(id);
         if (response.isSuccess()) {
             return ResponseEntity.ok(response);
@@ -90,7 +90,7 @@ public class TicketController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<Ticket>> updateTicket(
-            @PathVariable String id, 
+            @PathVariable Long id, 
             @Valid @RequestBody Ticket ticket) {
         ApiResponse<Ticket> response = ticketService.updateTicket(id, ticket);
         if (response.isSuccess()) {
@@ -102,7 +102,7 @@ public class TicketController {
 
     @PutMapping(value = "/{id}", consumes = "multipart/form-data")
     public ResponseEntity<ApiResponse<Ticket>> updateTicketWithImages(
-            @PathVariable String id,
+            @PathVariable Long id,
             @RequestParam("title") @NotBlank @Size(min = 3, max = 100) String title,
             @RequestParam("description") @NotBlank @Size(min = 10, max = 1000) String description,
             @RequestParam("category") @NotBlank String category,
@@ -144,7 +144,7 @@ public class TicketController {
 
     @PutMapping("/{id}/assign")
     public ResponseEntity<ApiResponse<Ticket>> assignTicket(
-            @PathVariable String id,
+            @PathVariable Long id,
             @RequestBody String technicianEmail) {
         ApiResponse<Ticket> response = ticketService.assignTicket(id, technicianEmail);
         if (response.isSuccess()) {
@@ -156,7 +156,7 @@ public class TicketController {
 
     @PutMapping("/{id}/resolve")
     public ResponseEntity<ApiResponse<Ticket>> resolveTicket(
-            @PathVariable String id,
+            @PathVariable Long id,
             @RequestBody String resolutionNotes) {
         ApiResponse<Ticket> response = ticketService.resolveTicket(id, resolutionNotes);
         if (response.isSuccess()) {
@@ -168,7 +168,7 @@ public class TicketController {
 
     @PutMapping("/{id}/reject")
     public ResponseEntity<ApiResponse<Ticket>> rejectTicket(
-            @PathVariable String id,
+            @PathVariable Long id,
             @RequestBody String rejectionReason) {
         ApiResponse<Ticket> response = ticketService.rejectTicket(id, rejectionReason);
         if (response.isSuccess()) {
@@ -180,7 +180,7 @@ public class TicketController {
 
     @PutMapping("/{id}/solve")
     public ResponseEntity<ApiResponse<Ticket>> solveTicket(
-            @PathVariable String id,
+            @PathVariable Long id,
             @RequestBody Map<String, String> solveRequest) {
         String message = solveRequest.get("message");
         String resolvedBy = solveRequest.get("resolvedBy");
@@ -194,7 +194,7 @@ public class TicketController {
 
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteTicket(@PathVariable String id) {
+    public ResponseEntity<ApiResponse<Void>> deleteTicket(@PathVariable Long id) {
         ApiResponse<Void> response = ticketService.deleteTicket(id);
         if (response.isSuccess()) {
             return ResponseEntity.ok(response);

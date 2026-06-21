@@ -2,11 +2,15 @@ package com.fms.bookings.model;
 
 import java.time.LocalDateTime;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import com.fms.bookings.enums.BookingStatus;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,11 +20,13 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "bookings")
+@Entity
+@Table(name = "bookings")
 public class Booking {
 
 	@Id
-	private String id;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
 	private String resourceId;
 	private String resourceName;
@@ -31,6 +37,7 @@ public class Booking {
 	private LocalDateTime startDateTime;
 	private LocalDateTime endDateTime;
 
+	@Enumerated(EnumType.STRING)
 	private BookingStatus status;
 	private String approvedBy;
 	private String rejectionReason;

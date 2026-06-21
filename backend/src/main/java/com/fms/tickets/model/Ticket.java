@@ -3,9 +3,17 @@ package com.fms.tickets.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 import jakarta.validation.constraints.*;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Table;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,13 +21,16 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "tickets")
+@Entity
+@Table(name = "tickets")
 public class Ticket {
 
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @NotBlank(message = "Ticket ID is required")
+    @Column(name = "ticket_id", nullable = false, unique = true)
     private String ticketId;
 
     @NotBlank(message = "Title is required")
@@ -28,6 +39,7 @@ public class Ticket {
 
     @NotBlank(message = "Description is required")
     @Size(min = 10, max = 1000, message = "Description must be between 10 and 1000 characters")
+    @Column(length = 1000)
     private String description;
 
     @NotBlank(message = "Category is required")
@@ -55,6 +67,10 @@ public class Ticket {
     private String assignedTo;
     private String rejectionReason;
     private String resolutionNotes;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "ticket_image_attachments", joinColumns = @JoinColumn(name = "ticket_id"))
+    @Column(name = "image_url")
     private List<String> imageAttachments; // Store image URLs
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

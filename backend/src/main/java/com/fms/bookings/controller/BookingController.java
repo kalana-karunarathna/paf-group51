@@ -42,7 +42,7 @@ public class BookingController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<ApiResponse<BookingResponse>> getBookingById(@PathVariable String id) {
+	public ResponseEntity<ApiResponse<BookingResponse>> getBookingById(@PathVariable Long id) {
 		return ResponseEntity.ok(ApiResponse.success("Booking fetched successfully.", bookingService.getBookingById(id)));
 	}
 
@@ -57,34 +57,34 @@ public class BookingController {
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<ApiResponse<BookingResponse>> updateBooking(@PathVariable String id,
+	public ResponseEntity<ApiResponse<BookingResponse>> updateBooking(@PathVariable Long id,
 		@Valid @RequestBody BookingUpdateRequest request) {
 		BookingResponse response = bookingService.updateBooking(id, request);
 		return ResponseEntity.ok(ApiResponse.success("Booking updated successfully.", response));
 	}
 
 	@PatchMapping("/{id}/cancel")
-	public ResponseEntity<ApiResponse<BookingResponse>> cancelBooking(@PathVariable String id) {
+	public ResponseEntity<ApiResponse<BookingResponse>> cancelBooking(@PathVariable Long id) {
 		BookingResponse response = bookingService.cancelBooking(id);
 		return ResponseEntity.ok(ApiResponse.success("Booking cancelled successfully.", response));
 	}
 
 	@PatchMapping("/{id}/approve")
-	public ResponseEntity<ApiResponse<BookingResponse>> approveBooking(@PathVariable String id,
+	public ResponseEntity<ApiResponse<BookingResponse>> approveBooking(@PathVariable Long id,
 		@RequestParam String approvedBy) {
 		BookingResponse response = bookingService.approveBooking(id, approvedBy);
 		return ResponseEntity.ok(ApiResponse.success("Booking approved successfully.", response));
 	}
 
 	@PatchMapping("/{id}/reject")
-	public ResponseEntity<ApiResponse<BookingResponse>> rejectBooking(@PathVariable String id,
+	public ResponseEntity<ApiResponse<BookingResponse>> rejectBooking(@PathVariable Long id,
 		@Valid @RequestBody BookingDecisionRequest request) {
 		BookingResponse response = bookingService.rejectBooking(id, request.getReason());
 		return ResponseEntity.ok(ApiResponse.success("Booking rejected successfully.", response));
 	}
 
 	@DeleteMapping("/{id}")
-	public ResponseEntity<ApiResponse<Void>> deleteBooking(@PathVariable String id) {
+	public ResponseEntity<ApiResponse<Void>> deleteBooking(@PathVariable Long id) {
 		bookingService.deleteBooking(id);
 		return ResponseEntity.ok(ApiResponse.success("Booking deleted successfully."));
 	}

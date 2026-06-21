@@ -27,7 +27,7 @@ public class CommentService {
         return email == null ? "" : email.trim().toLowerCase(Locale.ROOT);
     }
 
-    public ApiResponse<Comment> createComment(String ticketId, String authorEmail, String authorName, String content, String authorRole) {
+    public ApiResponse<Comment> createComment(Long ticketId, String authorEmail, String authorName, String content, String authorRole) {
         try {
             // Verify ticket exists
             Optional<Ticket> ticketOpt = ticketRepository.findById(ticketId);
@@ -53,7 +53,7 @@ public class CommentService {
                 if (!recipientEmail.isEmpty()) {
                     notificationService.createTicketCommentNotification(
                         recipientEmail,
-                        ticket.getId(),
+                        String.valueOf(ticket.getId()),
                         ticket.getTitle(),
                         authorName
                     );
@@ -66,7 +66,7 @@ public class CommentService {
         }
     }
 
-    public ApiResponse<List<Comment>> getCommentsByTicketId(String ticketId) {
+    public ApiResponse<List<Comment>> getCommentsByTicketId(Long ticketId) {
         try {
             // Verify ticket exists
             if (!ticketRepository.existsById(ticketId)) {
@@ -80,7 +80,7 @@ public class CommentService {
         }
     }
 
-    public ApiResponse<Comment> updateComment(String commentId, String userEmail, String userRole, String newContent) {
+    public ApiResponse<Comment> updateComment(Long commentId, String userEmail, String userRole, String newContent) {
         try {
             Optional<Comment> commentOpt = commentRepository.findById(commentId);
             if (commentOpt.isPresent()) {
@@ -104,7 +104,7 @@ public class CommentService {
         }
     }
 
-    public ApiResponse<Void> deleteComment(String commentId, String userEmail, String userRole) {
+    public ApiResponse<Void> deleteComment(Long commentId, String userEmail, String userRole) {
         try {
             Optional<Comment> commentOpt = commentRepository.findById(commentId);
             if (commentOpt.isPresent()) {
@@ -125,7 +125,7 @@ public class CommentService {
         }
     }
 
-    public ApiResponse<Comment> getCommentById(String commentId) {
+    public ApiResponse<Comment> getCommentById(Long commentId) {
         try {
             Optional<Comment> comment = commentRepository.findById(commentId);
             if (comment.isPresent()) {
@@ -138,7 +138,7 @@ public class CommentService {
         }
     }
 
-    public void deleteCommentsByTicketId(String ticketId) {
+    public void deleteCommentsByTicketId(Long ticketId) {
         commentRepository.deleteByTicketId(ticketId);
     }
 

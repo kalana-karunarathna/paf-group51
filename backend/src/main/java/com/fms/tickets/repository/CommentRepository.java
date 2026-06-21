@@ -1,27 +1,25 @@
 package com.fms.tickets.repository;
 
 import com.fms.tickets.model.Comment;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface CommentRepository extends MongoRepository<Comment, String> {
+public interface CommentRepository extends JpaRepository<Comment, Long> {
     
     // Find all comments for a specific ticket, ordered by creation date
-    List<Comment> findByTicketIdOrderByCreatedAtAsc(String ticketId);
+    List<Comment> findByTicketIdOrderByCreatedAtAsc(Long ticketId);
     
     // Find comments by author email
     List<Comment> findByAuthorEmail(String authorEmail);
     
     // Count comments for a specific ticket
-    @Query(value = "{ 'ticket_id': ?0 }", count = true)
-    long countByTicketId(String ticketId);
+    long countByTicketId(Long ticketId);
     
     // Delete all comments for a ticket (when ticket is deleted)
-    void deleteByTicketId(String ticketId);
+    void deleteByTicketId(Long ticketId);
     
     // Find comments by author role
     List<Comment> findByAuthorRole(String authorRole);

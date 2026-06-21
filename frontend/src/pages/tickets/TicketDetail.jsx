@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from '../../api/axios';
+import { BACKEND_URL } from '../../config/api';
 import Comments from '../../components/Comments';
 
 const TicketDetail = () => {
@@ -399,7 +400,7 @@ const TicketDetail = () => {
                     overflow: 'hidden'
                   }}>
                     <img
-                      src={`http://localhost:8080${image}`}
+                      src={`${BACKEND_URL}${image}`}
                       alt={`Ticket image ${index + 1}`}
                       style={{
                         width: '100%',

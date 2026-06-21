@@ -42,7 +42,7 @@ public class TicketService {
         if (assigneeChanged && !nextAssignee.isEmpty()) {
             notificationService.createTicketAssignedNotification(
                 nextAssignee,
-                updatedTicket.getId(),
+                String.valueOf(updatedTicket.getId()),
                 updatedTicket.getTitle(),
                 "System"
             );
@@ -52,19 +52,19 @@ public class TicketService {
             if ("RESOLVED".equals(nextStatus)) {
                 notificationService.createTicketResolvedNotification(
                     ownerEmail,
-                    updatedTicket.getId(),
+                    String.valueOf(updatedTicket.getId()),
                     updatedTicket.getTitle()
                 );
             } else if ("REJECTED".equals(nextStatus)) {
                 notificationService.createTicketRejectedNotification(
                     ownerEmail,
-                    updatedTicket.getId(),
+                    String.valueOf(updatedTicket.getId()),
                     updatedTicket.getTitle()
                 );
             } else {
                 notificationService.createTicketStatusChangedNotification(
                     ownerEmail,
-                    updatedTicket.getId(),
+                    String.valueOf(updatedTicket.getId()),
                     updatedTicket.getTitle(),
                     nextStatus
                 );
@@ -93,7 +93,7 @@ public class TicketService {
             // Create notification for ticket creation
             notificationService.createTicketCreatedNotification(
                 savedTicket.getSubmittedBy(), 
-                savedTicket.getId(), 
+                String.valueOf(savedTicket.getId()), 
                 savedTicket.getTitle()
             );
             
@@ -112,7 +112,7 @@ public class TicketService {
         }
     }
 
-    public ApiResponse<Ticket> getTicketById(String id) {
+    public ApiResponse<Ticket> getTicketById(Long id) {
         try {
             Optional<Ticket> ticket = ticketRepository.findById(id);
             if (ticket.isPresent()) {
@@ -125,7 +125,7 @@ public class TicketService {
         }
     }
 
-    public ApiResponse<Ticket> updateTicket(String id, Ticket ticketDetails) {
+    public ApiResponse<Ticket> updateTicket(Long id, Ticket ticketDetails) {
         try {
             Optional<Ticket> existingTicket = ticketRepository.findById(id);
             if (existingTicket.isPresent()) {
@@ -154,7 +154,7 @@ public class TicketService {
         }
     }
 
-    public ApiResponse<Ticket> updateTicketWithImages(String id, Ticket ticketDetails, MultipartFile[] images) {
+    public ApiResponse<Ticket> updateTicketWithImages(Long id, Ticket ticketDetails, MultipartFile[] images) {
         try {
             Optional<Ticket> existingTicket = ticketRepository.findById(id);
             if (existingTicket.isPresent()) {
@@ -194,7 +194,7 @@ public class TicketService {
         }
     }
 
-    public ApiResponse<Ticket> assignTicket(String id, String technicianEmail) {
+    public ApiResponse<Ticket> assignTicket(Long id, String technicianEmail) {
         try {
             Optional<Ticket> ticket = ticketRepository.findById(id);
             if (ticket.isPresent()) {
@@ -205,14 +205,14 @@ public class TicketService {
                 // Create notification for ticket assignment
                 notificationService.createTicketAssignedNotification(
                     technicianEmail, 
-                    savedTicket.getId(), 
+                    String.valueOf(savedTicket.getId()), 
                     savedTicket.getTitle(),
                     "System"
                 );
 
                 notificationService.createTicketStatusChangedNotification(
                     savedTicket.getSubmittedBy(),
-                    savedTicket.getId(),
+                    String.valueOf(savedTicket.getId()),
                     savedTicket.getTitle(),
                     savedTicket.getStatus()
                 );
@@ -226,7 +226,7 @@ public class TicketService {
         }
     }
 
-    public ApiResponse<Ticket> resolveTicket(String id, String resolutionNotes) {
+    public ApiResponse<Ticket> resolveTicket(Long id, String resolutionNotes) {
         try {
             Optional<Ticket> ticket = ticketRepository.findById(id);
             if (ticket.isPresent()) {
@@ -237,7 +237,7 @@ public class TicketService {
                 // Create notification for ticket resolution
                 notificationService.createTicketResolvedNotification(
                     savedTicket.getSubmittedBy(), 
-                    savedTicket.getId(), 
+                    String.valueOf(savedTicket.getId()), 
                     savedTicket.getTitle()
                 );
                 
@@ -250,7 +250,7 @@ public class TicketService {
         }
     }
 
-    public ApiResponse<Ticket> rejectTicket(String id, String reason) {
+    public ApiResponse<Ticket> rejectTicket(Long id, String reason) {
         try {
             Optional<Ticket> ticket = ticketRepository.findById(id);
             if (ticket.isPresent()) {
@@ -261,7 +261,7 @@ public class TicketService {
                 // Create notification for ticket rejection
                 notificationService.createTicketRejectedNotification(
                     existingTicket.getSubmittedBy(),
-                    existingTicket.getId(),
+                    String.valueOf(existingTicket.getId()),
                     existingTicket.getTitle()
                 );
                 
@@ -274,7 +274,7 @@ public class TicketService {
         }
     }
 
-    public ApiResponse<Ticket> solveTicket(String id, String message, String resolvedBy) {
+    public ApiResponse<Ticket> solveTicket(Long id, String message, String resolvedBy) {
         try {
             Optional<Ticket> ticket = ticketRepository.findById(id);
             if (ticket.isPresent()) {
@@ -289,7 +289,7 @@ public class TicketService {
                 // Create notification for ticket resolution
                 notificationService.createTicketResolvedNotification(
                     existingTicket.getSubmittedBy(),
-                    existingTicket.getId(),
+                    String.valueOf(existingTicket.getId()),
                     existingTicket.getTitle()
                 );
                 
@@ -304,7 +304,7 @@ public class TicketService {
         }
     }
 
-    public ApiResponse<Void> deleteTicket(String id) {
+    public ApiResponse<Void> deleteTicket(Long id) {
         try {
             if (ticketRepository.existsById(id)) {
                 // Delete all comments associated with this ticket

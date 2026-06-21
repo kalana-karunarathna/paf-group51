@@ -1,13 +1,13 @@
 package com.fms.notifications.repository;
 
 import com.fms.notifications.model.Notification;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
-public interface NotificationRepository extends MongoRepository<Notification, String> {
+public interface NotificationRepository extends JpaRepository<Notification, Long> {
     List<Notification> findAllByOrderByCreatedAtDesc();
     List<Notification> findByRecipientEmailOrderByCreatedAtDesc(String recipientEmail);
     List<Notification> findByRecipientEmailAndIsReadFalseOrderByCreatedAtDesc(String recipientEmail);

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import axios from '../../api/axios';
+import { BACKEND_URL } from '../../config/api';
 import { useNavigate } from 'react-router-dom';
 
 export default function TicketAdmin() {
@@ -1110,7 +1111,7 @@ export default function TicketAdmin() {
                         alignItems: 'center'
                       }}>
                         <img
-                          src={`http://localhost:8080${image}`}
+                          src={`${BACKEND_URL}${image}`}
                           alt={`Ticket image ${index + 1}`}
                           style={{
                             maxWidth: '100%',

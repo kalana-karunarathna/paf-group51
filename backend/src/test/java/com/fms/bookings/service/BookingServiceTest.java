@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -75,19 +76,19 @@ class BookingServiceTest {
 	void approveBooking_shouldApprovePendingBookingAndPublishEvent() {
 		Booking booking = pendingBooking();
 
-		when(bookingRepository.findById("b1")).thenReturn(Optional.of(booking));
-		when(bookingRepository.findConflictingBookingsExcludingId(anyString(), anyList(), any(), any(), anyString()))
+		when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
+		when(bookingRepository.findConflictingBookingsExcludingId(anyString(), anyList(), any(), any(), anyLong()))
 			.thenReturn(List.of());
 		when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-		BookingResponse response = bookingService.approveBooking("b1", "admin1");
+		BookingResponse response = bookingService.approveBooking(1L, "admin1");
 
 		assertEquals(BookingStatus.APPROVED, response.getStatus());
 		assertEquals("admin1", response.getApprovedBy());
 		ArgumentCaptor<Object> eventCaptor = ArgumentCaptor.forClass(Object.class);
 		verify(eventPublisher).publishEvent(eventCaptor.capture());
 		BookingDecisionEvent event = (BookingDecisionEvent) eventCaptor.getValue();
-		assertEquals("b1", event.bookingId());
+		assertEquals(1L, event.bookingId());
 		assertEquals(BookingStatus.APPROVED, event.status());
 		}
 
@@ -95,11 +96,11 @@ class BookingServiceTest {
 	void approveBooking_shouldThrowConflictWhenAnotherBookingOverlaps() {
 		Booking booking = pendingBooking();
 
-		when(bookingRepository.findById("b1")).thenReturn(Optional.of(booking));
-		when(bookingRepository.findConflictingBookingsExcludingId(anyString(), anyList(), any(), any(), anyString()))
+		when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
+		when(bookingRepository.findConflictingBookingsExcludingId(anyString(), anyList(), any(), any(), anyLong()))
 			.thenReturn(List.of(existingBooking()));
 
-		assertThrows(BookingConflictException.class, () -> bookingService.approveBooking("b1", "admin1"));
+		assertThrows(BookingConflictException.class, () -> bookingService.approveBooking(1L, "admin1"));
 		verify(bookingRepository, never()).save(any(Booking.class));
 		verify(eventPublisher, never()).publishEvent(any());
 	}
@@ -107,17 +108,17 @@ class BookingServiceTest {
 	@Test
 	void rejectBooking_shouldRejectPendingBookingAndPublishEvent() {
 		Booking booking = pendingBooking();
-		when(bookingRepository.findById("b1")).thenReturn(Optional.of(booking));
+		when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
 		when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-		BookingResponse response = bookingService.rejectBooking("b1", "Not available");
+		BookingResponse response = bookingService.rejectBooking(1L, "Not available");
 
 		assertEquals(BookingStatus.REJECTED, response.getStatus());
 		assertEquals("Not available", response.getRejectionReason());
 		ArgumentCaptor<Object> eventCaptor = ArgumentCaptor.forClass(Object.class);
 		verify(eventPublisher).publishEvent(eventCaptor.capture());
 		BookingDecisionEvent event = (BookingDecisionEvent) eventCaptor.getValue();
-		assertEquals("b1", event.bookingId());
+		assertEquals(1L, event.bookingId());
 		assertEquals(BookingStatus.REJECTED, event.status());
 	}
 
@@ -125,9 +126,9 @@ class BookingServiceTest {
 	void rejectBooking_shouldThrowInvalidStateWhenAlreadyApproved() {
 		Booking booking = pendingBooking();
 		booking.setStatus(BookingStatus.APPROVED);
-		when(bookingRepository.findById("b1")).thenReturn(Optional.of(booking));
+		when(bookingRepository.findById(1L)).thenReturn(Optional.of(booking));
 
-		assertThrows(InvalidBookingStateException.class, () -> bookingService.rejectBooking("b1", "No"));
+		assertThrows(InvalidBookingStateException.class, () -> bookingService.rejectBooking(1L, "No"));
 		verify(bookingRepository, never()).save(any(Booking.class));
 	}
 
@@ -144,7 +145,7 @@ class BookingServiceTest {
 
 	private Booking pendingBooking() {
 		return Booking.builder()
-			.id("b1")
+			.id(1L)
 			.resourceId("LAB-101")
 			.resourceName("Computer Lab 101")
 			.requestedBy("student1")
@@ -157,7 +158,7 @@ class BookingServiceTest {
 
 	private Booking existingBooking() {
 		return Booking.builder()
-			.id("existing")
+			.id(2L)
 			.resourceId("LAB-101")
 			.startDateTime(LocalDateTime.of(2026, 4, 18, 10, 30))
 			.endDateTime(LocalDateTime.of(2026, 4, 18, 11, 30))
