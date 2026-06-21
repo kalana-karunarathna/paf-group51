@@ -35,16 +35,20 @@ phases:
     commands:
       - echo "Build phase started"
 
-      - echo "Running backend Maven tests"
+      - echo "Running backend Maven tests and packaging jar"
       - cd backend
       - mvn -version
-      - mvn -B clean test
+      - mvn -B clean package
+      - echo "Listing backend target folder"
+      - ls -lah target
       - cd ..
 
       - echo "Running frontend build"
       - cd frontend
       - npm ci
       - npm run build
+      - echo "Listing frontend dist folder"
+      - ls -lah dist
       - cd ..
 
       - echo "Building backend Docker image"
