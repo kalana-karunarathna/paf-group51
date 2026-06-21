@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+target/
+uploads/
+.m2/
+.tools/
+*.log
+
+.git/
+.gitignore
+README.md

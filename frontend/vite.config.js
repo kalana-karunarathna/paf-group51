@@ -6,7 +6,11 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: process.env.VITE_BACKEND_PROXY_TARGET || 'http://localhost:8084',
+        changeOrigin: true
+      },
+      '/uploads': {
+        target: process.env.VITE_BACKEND_PROXY_TARGET || 'http://localhost:8084',
         changeOrigin: true
       }
     }
