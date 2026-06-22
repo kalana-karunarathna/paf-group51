@@ -1,0 +1,53 @@
+version: 0.2
+
+env:
+  variables:
+    AWS_REGION: "us-east-1"
+    CLUSTER_NAME: "kalana-eks-Ku6Gd8xb"
+    NAMESPACE: "smart-campus"
+
+phases:
+  install:
+    commands:
+      - echo "Installing kubectl"
+      - curl -sS -o kubectl https://s3.us-west-2.amazonaws.com/amazon-eks/1.35.0/2025-05-01/bin/linux/amd64/kubectl
+      - chmod +x kubectl
+      - mv kubectl /usr/local/bin/
+      - kubectl version --client
+
+  pre_build:
+    commands:
+      - echo "Configuring kubeconfig for EKS"
+      - aws sts get-caller-identity
+      - aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
+      - kubectl config current-context
+
+  build:
+    commands:
+      - echo "Deploying Kubernetes manifests to EKS"
+      - kubectl apply -f k8s/base/namespace.yaml
+      - kubectl apply -f k8s/base/configmap.yaml
+      - kubectl apply -f k8s/base/secret.yaml
+      - kubectl apply -f k8s/base/backend.yaml
+      - kubectl apply -f k8s/base/frontend.yaml
+      - kubectl apply -f k8s/base/ingress.yaml
+
+      - echo "Restarting deployments to pick latest ECR image tag dev"
+      - kubectl rollout restart deployment/backend -n $NAMESPACE
+      - kubectl rollout restart deployment/frontend -n $NAMESPACE
+
+      - echo "Waiting for rollout"
+      - kubectl rollout status deployment/backend -n $NAMESPACE --timeout=300s
+      - kubectl rollout status deployment/frontend -n $NAMESPACE --timeout=300s
+
+  post_build:
+    commands:
+      - echo "Deployment completed"
+      - kubectl get pods -n $NAMESPACE
+      - kubectl get svc -n $NAMESPACE
+      - kubectl get ingress -n $NAMESPACE
+
+artifacts:
+  files:
+    - buildspec-deploy.yml
+    - k8s/base/**/*
