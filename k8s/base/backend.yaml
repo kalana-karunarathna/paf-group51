@@ -1,0 +1,92 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: smart-campus
+spec:
+  selector:
+    app: backend
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8084
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: smart-campus
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: 016170083143.dkr.ecr.us-east-1.amazonaws.com/campus-backend:dev
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8084
+
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                  name: smart-campus-config
+                  key: SPRING_PROFILES_ACTIVE
+
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: smart-campus-config
+                  key: DB_HOST
+
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: smart-campus-config
+                  key: DB_PORT
+
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: smart-campus-config
+                  key: DB_NAME
+
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://$(DB_HOST):$(DB_PORT)/$(DB_NAME)
+
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: smart-campus-secret
+                  key: DB_USERNAME
+
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: smart-campus-secret
+                  key: DB_PASSWORD
+
+          readinessProbe:
+            httpGet:
+              path: /api/resources
+              port: 8084
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 10
+
+          livenessProbe:
+            tcpSocket:
+              port: 8084
+            initialDelaySeconds: 120
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 5

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: smart-campus-config
+  namespace: smart-campus
+data:
+  SPRING_PROFILES_ACTIVE: "prod"
+  SERVER_PORT: "8080"
+
+  # Temporary Kubernetes PostgreSQL service
+  DB_HOST: "postgres"
+  DB_PORT: "5432"
+  DB_NAME: "smartcampus"
+
+  # Later when RDS is ready, only change DB_HOST like this:
+  # DB_HOST: "your-rds-endpoint.us-east-1.rds.amazonaws.com"
