@@ -17,6 +17,7 @@ test-mongo.js
 test-mongo-connection.ps1
 
 
+
 # IDE and OS files
 .idea/
 .vscode/
@@ -26,3 +27,9 @@ Thumbs.db
 
 # Logs
 *.log
+
+# AWS local debug/generated files
+pipeline-debug*.json
+codebuild-*-policy.json
+codepipeline-*-policy.json
+smart-campus-dashboard.json

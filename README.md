@@ -1,139 +1,328 @@
-# facility-management-system
+# Smart Campus Facility Management System — AWS DevOps CI/CD Project
 
-Root scaffold for a Spring Boot + MongoDB + React (Vite) facility management platform. The repository is organized so four group members can clone the same project and work only inside their assigned module folders.
+This project demonstrates a complete AWS-native DevOps workflow for a containerized Smart Campus Facility Management System.
+
+The application is built with a Spring Boot backend, React frontend, PostgreSQL database, Docker, Kubernetes, AWS CodePipeline, AWS CodeBuild, Amazon ECR, Amazon EKS, Amazon RDS, AWS Application Load Balancer, SonarQube Cloud, Trivy, and CloudWatch.
 
 ## Project Overview
 
-- `backend/` contains the Spring Boot API skeleton.
-- `frontend/` contains the React + Vite client skeleton.
-- Shared helpers are already in place for API responses, routing, CORS, auth context, and navigation.
-- No feature implementation is included yet, so each member can build on a clean module boundary.
+The Smart Campus Facility Management System helps manage campus resources, bookings, tickets, maintenance requests, and facility operations.
 
-## Prerequisites
+This project was enhanced from a normal full-stack application into a cloud-ready DevOps project with automated build, code quality analysis, security scanning, image publishing, Kubernetes deployment, public access, database integration, and monitoring.
 
-- Java 17
-- Node 18 or newer
-- MongoDB running locally
+## Tech Stack
 
-## Run Backend
+### Application
 
-```bash
-cd backend
-.\mvnw.cmd spring-boot:run
+* Frontend: React, Vite, Nginx
+* Backend: Spring Boot, Java 17, Maven
+* Database: PostgreSQL
+* Containerization: Docker, Docker Compose
+* Orchestration: Kubernetes on Amazon EKS
+
+### DevOps and AWS Services
+
+* AWS CodePipeline
+* AWS CodeBuild
+* Amazon ECR
+* Amazon EKS
+* Amazon RDS PostgreSQL
+* AWS Application Load Balancer
+* AWS Load Balancer Controller
+* AWS CloudWatch Logs
+* AWS CloudWatch Dashboard
+* SonarQube Cloud
+* Trivy
+
+## CI/CD Pipeline
+
+The CI/CD pipeline is fully automated.
+
+A push to the `dev` branch automatically triggers AWS CodePipeline.
+
+```text
+git push origin dev
+→ AWS CodePipeline
+→ Source stage
+→ CodeBuild build stage
+→ SonarQube Cloud code quality scan
+→ Docker image build
+→ Trivy image vulnerability scan
+→ Push images to Amazon ECR
+→ CodeBuild deploy stage
+→ Deploy to Amazon EKS
+→ Application exposed through AWS ALB
 ```
 
-## Run Frontend
+## Architecture
 
-```bash
-cd frontend
-npm install
-npm run dev
+```text
+Developer
+  |
+  | git push origin dev
+  v
+GitHub Repository
+  |
+  v
+AWS CodePipeline
+  |
+  +--> Source Stage
+  |
+  +--> Build Stage: AWS CodeBuild
+  |       - Backend Maven build
+  |       - SonarQube Cloud static code analysis
+  |       - Frontend production build
+  |       - Docker image build
+  |       - Trivy image security scan
+  |       - Push images to Amazon ECR
+  |
+  +--> Deploy Stage: AWS CodeBuild
+          - Configure kubectl
+          - Apply Kubernetes manifests
+          - Restart Kubernetes deployments
+          - Wait for rollout status
+
+Internet User
+  |
+  v
+AWS Application Load Balancer
+  |
+  v
+Kubernetes Ingress
+  |
+  v
+Frontend Service
+  |
+  v
+Frontend Pods
+  |
+  v
+Backend Service
+  |
+  v
+Backend Pods
+  |
+  v
+Amazon RDS PostgreSQL
 ```
 
-## Module Ownership
+## SonarQube Cloud Integration
 
-| Member | Folder | Responsibility |
-| --- | --- | --- |
-| Member 1 | `backend/src/main/java/com/fms/resources` and `frontend/src/pages/resources` | Resources module |
-| Member 2 | `backend/src/main/java/com/fms/bookings` and `frontend/src/pages/bookings` | Bookings module |
-| Member 3 | `backend/src/main/java/com/fms/tickets` and `frontend/src/pages/tickets` | Tickets module |
-| Member 4 | `backend/src/main/java/com/fms/auth`, `backend/src/main/java/com/fms/notifications`, and `frontend/src/pages/auth` | Auth and notifications |
+SonarQube Cloud is integrated into AWS CodeBuild to perform static code analysis.
 
-## Git Workflow
+It checks:
 
-- Each member works only in their own assigned backend package and frontend folder.
-- Shared files such as `ApiResponse`, `CorsConfig`, `SecurityConfig`, `App.jsx`, and `Navbar.jsx` should be treated as common infrastructure.
-- Avoid creating controllers, services, repositories, or models outside your own module folder unless the team agrees on a shared utility.
-- Do not commit `.env`, `node_modules`, `target`, or `dist`.
+* Code quality
+* Bugs
+* Code smells
+* Maintainability issues
+* Reliability issues
+* Security issues
+* Duplicated code
 
-## GitHub Workflow
+SonarQube Cloud project:
 
-1. One person creates the GitHub repository and pushes this starter scaffold.
-2. Everyone else clones the same repo from GitHub.
-3. Each member creates their own branch from `main`, for example:
-   - `member1/resources`
-   - `member2/bookings`
-   - `member3/tickets`
-   - `member4/auth`
-4. Each member only edits their own module folder unless the team has agreed on a shared file change.
-5. Before pushing, run `git status` and make sure you are not including files from another member's module.
-6. Pull the latest `main` before opening a pull request or merging.
-7. Merge only after the code is reviewed by the team.
+```text
+Organization: kalana-karunarathna
+Project: paf-group51
+Branch: dev
+```
 
-## Conflict Prevention
+## Trivy Security Scanning
 
-- Keep backend work inside the correct package:
-  - Member 1: `backend/src/main/java/com/fms/resources`
-  - Member 2: `backend/src/main/java/com/fms/bookings`
-  - Member 3: `backend/src/main/java/com/fms/tickets`
-  - Member 4: `backend/src/main/java/com/fms/auth` and `backend/src/main/java/com/fms/notifications`
-- Keep frontend work inside the matching page folders:
-  - Member 1: `frontend/src/pages/resources`
-  - Member 2: `frontend/src/pages/bookings`
-  - Member 3: `frontend/src/pages/tickets`
-  - Member 4: `frontend/src/pages/auth`
-- Shared files should be changed by only one person at a time.
-- If two members need the same shared file, coordinate first before editing.
+Trivy is used in the build stage to scan Docker images for vulnerabilities.
 
-## Keep Same
+It scans:
 
-These files and rules should stay the same for everyone unless the whole team agrees to change them:
+* Operating system packages
+* Application dependencies
+* Container image vulnerabilities
+* HIGH and CRITICAL vulnerabilities
 
-- Root structure:
-  - `backend/`
-  - `frontend/`
-  - `.gitignore`
-  - `README.md`
-  - `.env` only for local secrets, not for Git commits
-- Backend shared files:
-  - `backend/pom.xml`
-  - `backend/src/main/java/com/fms/FmsApplication.java`
-  - `backend/src/main/java/com/fms/config/CorsConfig.java`
-  - `backend/src/main/java/com/fms/config/SecurityConfig.java`
-  - `backend/src/main/java/com/fms/common/ApiResponse.java`
-  - `backend/src/main/resources/application.properties`
-- Frontend shared files:
-  - `frontend/package.json`
-  - `frontend/vite.config.js`
-  - `frontend/src/App.jsx`
-  - `frontend/src/main.jsx`
-  - `frontend/src/api/axios.js`
-  - `frontend/src/context/AuthContext.jsx`
-  - `frontend/src/components/Navbar.jsx`
-  - `frontend/src/pages/Home.jsx`
-  - `frontend/src/pages/Home.css`
-- Routing and API rules:
-  - Backend stays under `com.fms.*`
-  - Frontend API base stays `http://localhost:8080/api`
-  - Frontend proxy stays pointed to `http://localhost:8080`
-  - The temporary security setup stays `permitAll` until Member 4 replaces it
+Current scan mode reports vulnerabilities without blocking the build.
 
-## Do Not Change Alone
+## Docker Images
 
-- Do not rename shared backend packages unless the whole team agrees.
-- Do not change the MongoDB database name without informing everyone.
-- Do not remove the `ApiResponse` wrapper or make custom response formats in separate modules.
-- Do not move shared frontend routing files unless the whole group updates imports together.
-- Do not edit `.env` and commit it to GitHub.
-- Do not overwrite another member's folder when merging.
+Docker images are built by AWS CodeBuild and pushed to Amazon ECR.
 
-## MongoDB
+```text
+016170083143.dkr.ecr.us-east-1.amazonaws.com/campus-backend:dev
+016170083143.dkr.ecr.us-east-1.amazonaws.com/campus-frontend:dev
+```
 
-- Local backend database name: `facility_management_db`
-- The root `.env` file also includes the provided Atlas connection string for `smartcampus`
+## Kubernetes Deployment
 
-### MongoDB Compass
+The application is deployed to Amazon EKS using Kubernetes manifests.
 
-1. Open MongoDB Compass.
-2. Paste the connection string you want to use:
-   - Local: `mongodb://localhost:27017/facility_management_db`
-   - Atlas: use the `MONGODB_URI` value from `.env`
-3. Connect and verify the database name:
-   - Local database: `facility_management_db`
-   - Atlas database: `smartcampus`
+Main namespace:
 
-## Notes
+```text
+smart-campus
+```
 
-- Backend security is temporarily open for development.
-- Member 4 will later replace the temporary security setup with OAuth2 and role-based access.
-- The backend uses a local Maven wrapper-style setup in `backend/.mvn`, `backend/mvnw`, and `backend/mvnw.cmd`.
+Main Kubernetes components:
+
+* Namespace
+* ConfigMap
+* Secret
+* Backend Deployment
+* Backend Service
+* Frontend Deployment
+* Frontend Service
+* Ingress
+* Readiness probes
+* Liveness probes
+
+## Database
+
+The backend connects to Amazon RDS PostgreSQL.
+
+```text
+Database engine: PostgreSQL
+Database name: smartcampus
+Database identifier: smart-campus-postgres
+```
+
+Database configuration is managed using Kubernetes ConfigMap and Secret.
+
+## Public Access
+
+The application is exposed publicly using AWS Application Load Balancer through Kubernetes Ingress.
+
+Traffic flow:
+
+```text
+Browser
+→ AWS ALB
+→ Kubernetes Ingress
+→ Frontend Service
+→ Frontend Pods
+→ Backend Service
+→ Backend Pods
+→ Amazon RDS PostgreSQL
+```
+
+## Monitoring and Logging
+
+CloudWatch Observability is enabled for the EKS cluster.
+
+CloudWatch includes:
+
+* CodeBuild logs
+* EKS application logs
+* EKS dataplane logs
+* EKS host logs
+* EKS performance metrics
+* EKS control plane logs
+* CloudWatch dashboard
+
+Dashboard name:
+
+```text
+smart-campus-devops-dashboard
+```
+
+The dashboard monitors:
+
+* EKS CPU usage
+* EKS memory usage
+* Pod restarts
+* Unavailable replicas
+* ALB request count
+* ALB errors
+* RDS CPU utilization
+* RDS database connections
+* CodeBuild build duration
+* CodeBuild failed builds
+
+## Important Commands
+
+Check Kubernetes resources:
+
+```bash
+kubectl get pods -n smart-campus
+kubectl get svc -n smart-campus
+kubectl get ingress -n smart-campus
+```
+
+Get ALB URL:
+
+```bash
+kubectl get ingress smart-campus-ingress \
+  -n smart-campus \
+  -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'
+```
+
+Test backend API through ALB:
+
+```bash
+curl -i http://<ALB-DNS-NAME>/api/resources
+```
+
+Check CodePipeline executions:
+
+```bash
+aws codepipeline list-pipeline-executions \
+  --pipeline-name smart-campus-dev-pipeline \
+  --region us-east-1 \
+  --max-items 5
+```
+
+Check ECR backend image:
+
+```bash
+aws ecr describe-images \
+  --repository-name campus-backend \
+  --region us-east-1
+```
+
+Check ECR frontend image:
+
+```bash
+aws ecr describe-images \
+  --repository-name campus-frontend \
+  --region us-east-1
+```
+
+## Completed DevOps Features
+
+* Local Docker Compose setup
+* PostgreSQL database migration
+* Backend Dockerfile
+* Frontend Dockerfile
+* Amazon ECR repositories
+* AWS CodeBuild build automation
+* SonarQube Cloud static code analysis
+* Trivy Docker image scanning
+* AWS CodePipeline automated CI/CD
+* Automatic GitHub dev branch trigger
+* Amazon EKS Kubernetes deployment
+* Kubernetes ConfigMap and Secret
+* Kubernetes readiness and liveness probes
+* AWS Load Balancer Controller
+* AWS ALB Ingress public access
+* Amazon RDS PostgreSQL integration
+* CloudWatch logs
+* CloudWatch monitoring dashboard
+
+## Final DevOps Flow
+
+```text
+git push origin dev
+→ CodePipeline auto trigger
+→ Source stage
+→ CodeBuild build stage
+→ SonarQube Cloud scan
+→ Docker build
+→ Trivy scan
+→ Push images to ECR
+→ CodeBuild deploy stage
+→ Deploy to EKS
+→ ALB serves the application
+→ Backend connects to Amazon RDS
+→ Logs and metrics available in CloudWatch
+```
+
+## Project Status
+
+Completed and working successfully.
